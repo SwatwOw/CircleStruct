@@ -1,0 +1,80 @@
+struct Circle
+    {
+        //Fields
+        double radius;
+        Point center;
+        List<Point> pointsForIntersection;
+
+        //Properties
+        public int X { get { return center.X; } }
+        public int Y { get { return center.Y; } }
+        public double Radius { get { return radius; } }
+
+        //Constructor
+        public Circle(int pX,int pY, double pRadius)
+        {
+            center = new Point(pX, pY);
+            radius = pRadius;
+            pointsForIntersection = new List<Point>();
+        }
+
+        #region Methods
+        /// <summary>
+        /// Checks for circle-to-circle intersection
+        /// </summary>
+        /// <param name="circle">circle to check against</param>
+        /// <returns>bool if intersectin or not</returns>
+        public bool Intersect(Circle otherCircle)
+        {
+            //point to check the distance
+            Point otherCenter = new Point(otherCircle.X, otherCircle.Y);
+
+            // distance < summation of radii
+            if (DistanceTo(otherCenter) <= (this.radius + otherCircle.radius))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks for the intersection of rectangle to Circle
+        /// </summary>
+        /// <param name="rect">rectangle to check against</param>
+        /// <returns>bool if intersecting or not</returns>
+        public bool Intersect(Rectangle rect)
+        {
+            
+            int widthBetweenTwoPoints;
+            int heightBetweenTwoPoints;
+            widthBetweenTwoPoints = rect.Width / 5;
+            heightBetweenTwoPoints = rect.Height / 5;
+            pointsForIntersection.Add(new Point(rect.X, rect.Y));
+            // adds points from rectangle's top side
+            for(int i = 1; i < 10; i++)
+            {
+                pointsForIntersection.Add(new Point(rect.X+widthBetweenTwoPoints,rect.Y));
+                pointsForIntersection.Add(new Point(rect.X + widthBetweenTwoPoints, rect.Y+rect.Height));
+                pointsForIntersection.Add(new Point(rect.X, rect.Y+heightBetweenTwoPoints));
+                pointsForIntersection.Add(new Point(rect.X+rect.Width, rect.Y + heightBetweenTwoPoints));
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Helper Method. 
+        /// Calculates distance between this.center and another point
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns>double distance between this circle's center and another point</returns>
+        public double DistanceTo(Point point)
+        {
+            return Math.Sqrt(Math.Pow((this.X - point.X), 2) + Math.Pow((this.Y - point.Y), 2));
+        }
+
+        #endregion
+    }

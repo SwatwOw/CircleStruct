@@ -2,20 +2,23 @@ struct Circle
     {
         //Fields
         double radius;
-        Point center;
-        List<Point> pointsForIntersection;
+        double diameter;
+        Vector2 center;
 
         //Properties
-        public int X { get { return center.X; } }
-        public int Y { get { return center.Y; } }
-        public double Radius { get { return radius; } }
+        public double X { get { return center.X; } set { this.center = new Vector2((float)value, this.center.Y); } }
+        public double Y { get { return center.Y; } set { this.center = new Vector2(this.center.X, (float)value); } }
+        public double Radius { get { return radius; } set { this.radius = value; } }
+        public double Diameter { get { return diameter; } }
+        public Vector2 Center { get { return center; } }
+
 
         //Constructor
-        public Circle(int pX,int pY, double pRadius)
+        public Circle(int pX, int pY, double pRadius)
         {
-            center = new Point(pX, pY);
+            center = new Vector2(pX, pY);
             radius = pRadius;
-            pointsForIntersection = new List<Point>();
+            diameter = radius * 2;            
         }
 
         #region Methods
@@ -24,13 +27,12 @@ struct Circle
         /// </summary>
         /// <param name="circle">circle to check against</param>
         /// <returns>bool if intersectin or not</returns>
-        public bool Intersect(Circle otherCircle)
+        public bool Intersects(Circle otherCircle)
         {
-            //point to check the distance
-            Point otherCenter = new Point(otherCircle.X, otherCircle.Y);
+            //Vector2 to check the distance
+            Vector2 otherCenter = new Vector2((float)otherCircle.X, (float)otherCircle.Y);
 
-            // distance < summation of radii
-            if (DistanceTo(otherCenter) <= (this.radius + otherCircle.radius))
+            if (this.DistanceTo(otherCircle.Center) <= (this.radius + otherCircle.Radius))
             {
                 return true;
             }
@@ -38,31 +40,35 @@ struct Circle
             {
                 return false;
             }
-        }
 
+        }
         /// <summary>
         /// Checks for the intersection of rectangle to Circle
         /// </summary>
         /// <param name="rect">rectangle to check against</param>
         /// <returns>bool if intersecting or not</returns>
-        public bool Intersect(Rectangle rect)
+        public bool Intersects(Rectangle rect)
         {
-            
-            int widthBetweenTwoPoints;
-            int heightBetweenTwoPoints;
-            widthBetweenTwoPoints = rect.Width / 5;
-            heightBetweenTwoPoints = rect.Height / 5;
-            pointsForIntersection.Add(new Point(rect.X, rect.Y));
-            // adds points from rectangle's top side
-            for(int i = 1; i < 10; i++)
+           
+            if (this.DistanceTo(new Vector2(rect.Center.X, rect.Top)) <= this.Radius ||
+               this.DistanceTo(new Vector2(rect.Center.X, rect.Bottom)) <= this.Radius ||
+               this.DistanceTo(new Vector2(rect.Right, rect.Center.Y)) <= this.Radius ||
+               this.DistanceTo(new Vector2(rect.Left, rect.Center.Y)) <= this.Radius)
             {
-                pointsForIntersection.Add(new Point(rect.X+widthBetweenTwoPoints,rect.Y));
-                pointsForIntersection.Add(new Point(rect.X + widthBetweenTwoPoints, rect.Y+rect.Height));
-                pointsForIntersection.Add(new Point(rect.X, rect.Y+heightBetweenTwoPoints));
-                pointsForIntersection.Add(new Point(rect.X+rect.Width, rect.Y + heightBetweenTwoPoints));
+                Console.WriteLine("It intersects");
+                return true;
             }
 
-            return false;
+            else if (this.DistanceTo(new Vector2(rect.X, rect.Y)) <= this.Radius || this.DistanceTo(new Vector2(rect.X + rect.Width, rect.Y)) <= this.Radius
+                || this.DistanceTo(new Vector2(rect.X + rect.Width, rect.Y + rect.Height)) <= this.Radius || this.DistanceTo(new Vector2(rect.X, rect.Y + rect.Height)) <= this.Radius)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
         /// <summary>
@@ -71,9 +77,10 @@ struct Circle
         /// </summary>
         /// <param name="point"></param>
         /// <returns>double distance between this circle's center and another point</returns>
-        public double DistanceTo(Point point)
+        public double DistanceTo(Vector2 vector)
         {
-            return Math.Sqrt(Math.Pow((this.X - point.X), 2) + Math.Pow((this.Y - point.Y), 2));
+            return Vector2.Distance(this.Center, vector);
+
         }
 
         #endregion
